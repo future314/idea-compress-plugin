@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Files
 import java.nio.file.Path
 
 /**
@@ -67,6 +68,59 @@ class ArchiveNamingTest {
     @Test
     fun `a file literally named with only a zip extension is still a dotfile`() {
         assertEquals(".zip", ArchiveNaming.baseNameFor(".zip", isDirectory = false))
+    }
+
+    // ---- baseNameFor over a whole selection ---------------------------
+
+    @Test
+    fun `several items sharing a parent are named after that parent`(@TempDir dir: Path) {
+        val parent = Files.createDirectories(dir.resolve("my-app"))
+        val selection = listOf(
+            ArchiveNaming.Selected(parent.resolve("src"), isDirectory = true),
+            ArchiveNaming.Selected(parent.resolve("docs"), isDirectory = true),
+            ArchiveNaming.Selected(parent.resolve("README.md"), isDirectory = false),
+        )
+
+        assertEquals("my-app", ArchiveNaming.baseNameFor(selection))
+    }
+
+    @Test
+    fun `the parent name is kept verbatim even when it looks like a file name`(@TempDir dir: Path) {
+        // A directory called `my.app` archives as `my.app.zip`, not `my.zip`.
+        val parent = Files.createDirectories(dir.resolve("my.app"))
+        val selection = listOf(
+            ArchiveNaming.Selected(parent.resolve("src"), isDirectory = true),
+            ArchiveNaming.Selected(parent.resolve("docs"), isDirectory = true),
+        )
+
+        assertEquals("my.app", ArchiveNaming.baseNameFor(selection))
+    }
+
+    @Test
+    fun `items with different parents fall back to the first item`(@TempDir dir: Path) {
+        val a = Files.createDirectories(dir.resolve("a"))
+        val b = Files.createDirectories(dir.resolve("b"))
+        val selection = listOf(
+            ArchiveNaming.Selected(a.resolve("src"), isDirectory = true),
+            ArchiveNaming.Selected(b.resolve("docs"), isDirectory = true),
+        )
+
+        assertEquals("src", ArchiveNaming.baseNameFor(selection))
+    }
+
+    @Test
+    fun `a single item is still named after itself`(@TempDir dir: Path) {
+        val parent = Files.createDirectories(dir.resolve("my-app"))
+        val selection = listOf(
+            ArchiveNaming.Selected(parent.resolve("readme.txt"), isDirectory = false),
+        )
+
+        assertEquals("readme", ArchiveNaming.baseNameFor(selection))
+    }
+
+    @Test
+    fun `an empty selection falls back to a neutral stem`() {
+        assertEquals("archive", ArchiveNaming.baseNameFor(emptyList()))
     }
 
     // ---- resolve -----------------------------------------------------

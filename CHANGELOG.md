@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-23
+
+### Changed
+
+- Selecting **several** items in the same directory now names the archive after
+  that directory instead of the first selected item: pick `src`, `docs` and
+  `README.md` inside `my-app` and get `my-app.zip`. Selections spanning
+  different parents keep the previous behaviour and use the first item's name.
+- The context-menu label always shows the name the archive will get, for both
+  single and multiple selections.
+
+[0.1.2]: https://github.com/lrong/idea-compress-plugin/releases/tag/v0.1.2
+
 ## [0.1.1] - 2026-11-23
 
 ### Fixed
@@ -42,5 +55,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Completion notification with **Show in Explorer**.
 - English and Simplified Chinese UI.
 
-[Unreleased]: https://github.com/lrong/idea-compress-plugin/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/lrong/idea-compress-plugin/compare/v0.1.2...HEAD
 [0.1.0]: https://github.com/lrong/idea-compress-plugin/releases/tag/v0.1.0

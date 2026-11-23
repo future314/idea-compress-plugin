@@ -28,19 +28,17 @@ class CompressAction : DumbAwareAction() {
             return
         }
         e.presentation.isEnabledAndVisible = true
-        e.presentation.text = if (files.size == 1) {
-            val stem = ArchiveNaming.baseNameFor(files[0].name, files[0].isDirectory)
-            CompressBundle.message("compress.action.text", "$stem.zip")
-        } else {
-            CompressBundle.message("compress.action.text.many", files.size)
-        }
+        // Cheap: the stem only, no collision scan, so a menu open never does I/O.
+        val stem = ArchiveNaming.baseNameFor(selectionOf(files))
+        e.presentation.text = CompressBundle.message("compress.action.text", "$stem.zip")
     }
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project
         val files = selectedFiles(e) ?: return
-        val paths = files.mapNotNull { VfsPaths.toPath(it) }
-        if (paths.isEmpty()) return
+        val selection = selectionOf(files)
+        if (selection.isEmpty()) return
+        val paths = selection.map { it.path }
 
         // ZipWriter streams from disk. Flush unsaved editor buffers first so the
         // archive contains what the user is looking at, not the last save.
@@ -48,7 +46,7 @@ class CompressAction : DumbAwareAction() {
 
         val first: Path = paths.first()
         val baseDir = first.toAbsolutePath().parent ?: return
-        val baseName = ArchiveNaming.baseNameFor(files[0].name, files[0].isDirectory)
+        val baseName = ArchiveNaming.baseNameFor(selection)
         val output = ArchiveNaming.resolve(baseDir, baseName, paths.toSet())
 
         ProgressManager.getInstance().run(
@@ -60,6 +58,9 @@ class CompressAction : DumbAwareAction() {
             ),
         )
     }
+
+    private fun selectionOf(files: Array<VirtualFile>): List<ArchiveNaming.Selected> =
+        files.mapNotNull { file -> VfsPaths.toPath(file)?.let { ArchiveNaming.Selected(it, file.isDirectory) } }
 
     /**
      * `VIRTUAL_FILE_ARRAY` covers the Project view including multi-select; the

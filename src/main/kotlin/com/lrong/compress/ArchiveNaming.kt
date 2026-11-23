@@ -27,6 +27,37 @@ object ArchiveNaming {
     private const val EXTENSION = ".zip"
     private const val FALLBACK_STEM = "archive"
 
+    /** One selected item and whether it is a directory. */
+    data class Selected(val path: Path, val isDirectory: Boolean)
+
+    /**
+     * The stem of the archive name for a whole selection.
+     *
+     *  - one item: named after that item (see [baseNameFor])
+     *  - several items that share a parent: named after the **parent directory**,
+     *    so selecting `src`, `docs` and `README.md` inside `my-app` yields
+     *    `my-app.zip`
+     *  - several items without a common parent: fall back to the first item's
+     *    name, since there is no "the" parent to name it after
+     */
+    fun baseNameFor(selection: List<Selected>): String {
+        val first = selection.firstOrNull() ?: return FALLBACK_STEM
+        val firstName = itemBaseName(first)
+        if (selection.size == 1) return firstName
+
+        val parents = selection.mapTo(HashSet()) { it.path.toAbsolutePath().normalize().parent }
+        // `singleOrNull()` is null both when the parents differ and when the one
+        // shared parent is the filesystem root, and both fall back to the item name.
+        val shared = parents.singleOrNull() ?: return firstName
+        val parentName = shared.fileName?.toString()
+        return parentName?.ifBlank { firstName } ?: firstName
+    }
+
+    private fun itemBaseName(item: Selected): String = baseNameFor(
+        item.path.fileName?.toString().orEmpty().ifEmpty { FALLBACK_STEM },
+        item.isDirectory,
+    )
+
     /**
      * The stem of the archive name for an item called [itemName].
      *
