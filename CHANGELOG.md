@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-23
+
+### Fixed
+
+- Exclusion patterns were applied to selected **file** roots, so right-clicking
+  `report.zip` with the default `*.zip` pattern produced a silently empty
+  archive. Roots are now exempt from exclusions, matching the documented
+  behaviour and the existing handling for directory roots.
+- A selection that could not be read (vanished, or ACL-denied) used to produce
+  a valid-looking empty ZIP and a success balloon reading "0 files". It now
+  fails with an error notification instead.
+- A selected root that is itself a symlink was dropped, yielding an empty
+  archive. The link target is now walked while keeping the link's own name.
+- `resource-bundle` is also declared on `<actions>`, removing a
+  "Cannot find plugin resource-bundle" warning from the IDE log.
+
+[0.1.1]: https://github.com/lrong/idea-compress-plugin/releases/tag/v0.1.1
+
 ## [0.1.0] - 2026-11-23
 
 ### Added
@@ -24,5 +42,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Completion notification with **Show in Explorer**.
 - English and Simplified Chinese UI.
 
-[Unreleased]: https://github.com/lrong/idea-compress-plugin/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/lrong/idea-compress-plugin/compare/v0.1.1...HEAD
 [0.1.0]: https://github.com/lrong/idea-compress-plugin/releases/tag/v0.1.0

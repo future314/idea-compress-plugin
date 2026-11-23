@@ -274,6 +274,64 @@ class ZipWriterTest {
         assertFalse(entries.any { it.startsWith("root/loop") }, "symlinked dir was traversed: $entries")
     }
 
+    @Test
+    fun aSelectedSymlinkToADirectoryIsArchivedUnderItsOwnName(@TempDir dir: Path) {
+        // Review finding 3: a selected root that is itself a symlink used to be
+        // dropped, yielding an empty archive. Requires symlink privilege, so it
+        // skips on Windows without Developer Mode / elevation.
+        val real = Files.createDirectories(dir.resolve("real"))
+        write(real, "inner/f.txt", "r")
+        val link = dir.resolve("link")
+        val ok = try {
+            Files.createSymbolicLink(link, real)
+            true
+        } catch (e: Exception) {
+            false
+        }
+        assumeTrue(ok, "symlink creation not permitted on this machine")
+        val out = dir.resolve("out.zip")
+
+        ZipWriter.write(listOf(link), out)
+
+        assertEquals(listOf("link/", "link/inner/", "link/inner/f.txt").sorted(), entriesOf(out).sorted())
+    }
+
+    @Test
+    fun aSelectedSymlinkToAFileIsArchivedUnderItsOwnName(@TempDir dir: Path) {
+        val real = write(dir, "real.txt", "payload")
+        val link = dir.resolve("link.txt")
+        val ok = try {
+            Files.createSymbolicLink(link, real)
+            true
+        } catch (e: Exception) {
+            false
+        }
+        assumeTrue(ok, "symlink creation not permitted on this machine")
+        val out = dir.resolve("out.zip")
+
+        ZipWriter.write(listOf(link), out)
+
+        assertEquals(listOf("link.txt"), entriesOf(out))
+    }
+
+    @Test
+    fun aSelectedDirectoryJunctionIsArchivedUnderItsOwnName(@TempDir dir: Path) {
+        // Windows junctions are creatable WITHOUT elevation (unlike symlinks)
+        // and Java reports them as ordinary directories, so unlike the two tests
+        // above this one actually runs here. It guards that root resolution does
+        // not change the entry naming for the common Windows case.
+        val real = Files.createDirectories(dir.resolve("real"))
+        write(real, "inner/f.txt", "r")
+        val junction = dir.resolve("link")
+        val ok = createJunction(junction, real)
+        assumeTrue(ok, "junction creation not permitted on this machine")
+        val out = dir.resolve("out.zip")
+
+        ZipWriter.write(listOf(junction), out)
+
+        assertEquals(listOf("link/", "link/inner/", "link/inner/f.txt").sorted(), entriesOf(out).sorted())
+    }
+
     // ---- cancellation and failure ------------------------------------
 
     @Test
@@ -303,6 +361,55 @@ class ZipWriterTest {
         assertTrue(entriesOf(out).contains("root/a.txt"))
     }
 
+    @Test
+    fun exclusionPatternsDoNotApplyToSelectedFileRoots(@TempDir dir: Path) {
+        // Right-clicking a .zip to re-pack it must not silently produce an empty
+        // archive just because `*.zip` is in the DEFAULT exclusion list. Review
+        // finding 1: visitFile lacked the root exemption that preVisitDirectory
+        // has, so a selected FILE root was filtered out by its own pattern.
+        val file = dir.resolve("data.zip")
+        Files.writeString(file, "payload")
+        val out = dir.resolve("out.zip")
+
+        ZipWriter.write(listOf(file), out, ExclusionRules(listOf("*.zip")))
+
+        assertTrue(entriesOf(out).contains("data.zip"), "selected file root was excluded by its own pattern")
+    }
+
+    @Test
+    fun exclusionPatternsDoNotApplyToSelectedRootsInAMixedSelection(@TempDir dir: Path) {
+        // `src/` + `module.iml` must both land in the archive even with the
+        // default `*.iml` pattern, otherwise the user sends a silently
+        // incomplete archive.
+        val root = Files.createDirectories(dir.resolve("src"))
+        write(root, "App.java", "a")
+        val iml = dir.resolve("module.iml")
+        Files.writeString(iml, "<module/>")
+        val out = dir.resolve("out.zip")
+
+        ZipWriter.write(listOf(root, iml), out, ExclusionRules(listOf("*.iml")))
+
+        val entries = entriesOf(out)
+        assertTrue(entries.contains("src/App.java"))
+        assertTrue(entries.contains("module.iml"), "selected .iml root was dropped")
+    }
+
+    // ---- empty archives must fail loudly ------------------------------
+
+    @Test
+    fun writeFailsLoudlyWhenNothingCouldBeArchived(@TempDir dir: Path) {
+        // Review finding 2: an unreadable or vanished selection used to produce
+        // a valid-looking empty ZIP and a success balloon saying "0 files".
+        val missing = dir.resolve("nope")
+        val out = dir.resolve("out.zip")
+
+        assertThrows(IllegalStateException::class.java) {
+            ZipWriter.write(listOf(missing), out)
+        }
+
+        assertFalse(Files.exists(out), "an empty archive must not be left behind")
+    }
+
     // ---- helpers -----------------------------------------------------
 
     private fun write(root: Path, relative: String, content: String): Path {
@@ -316,5 +423,16 @@ class ZipWriterTest {
         ZipFile(zip.toFile(), Charsets.UTF_8).use { zf ->
             return zf.entries().toList().map { it.name }
         }
+    }
+
+    /** Windows-only: `mklink /J` needs no elevation, unlike a real symlink. */
+    private fun createJunction(link: Path, target: Path): Boolean = try {
+        val process = ProcessBuilder("cmd", "/c", "mklink", "/J", link.toString(), target.toString())
+            .redirectErrorStream(true)
+            .start()
+        process.inputStream.readBytes()
+        process.waitFor() == 0 && Files.exists(link)
+    } catch (e: Exception) {
+        false
     }
 }

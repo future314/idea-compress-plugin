@@ -45,7 +45,11 @@
                 key="settings.displayName"/>
     </extensions>
 
-    <actions>
+    <!-- resource-bundle is declared both at the root and on <actions>: the
+         PluginManager resolves action text through the actions-level bundle,
+         and a root-only declaration produced "Cannot find plugin ...
+         resource-bundle" in the IDE log. Keeping both is harmless. -->
+    <actions resource-bundle="messages.CompressBundle">
         <action id="Compress.CompressAction"
                 class="com.lrong.compress.CompressAction"
                 text="Compress to ZIP"

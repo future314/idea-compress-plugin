@@ -98,6 +98,18 @@ object ZipWriter {
         val sources = resolveSources(items)
         val plan = plan(sources, target, exclusions, isCancelled)
 
+        // Every selected root is exempt from exclusions, so a non-empty
+        // selection that plans to zero entries means nothing could actually be
+        // read (it vanished between selection and this task, or the ACL refused
+        // it). Fail loudly rather than hand the user a valid-looking empty ZIP
+        // and a success balloon saying "0 files".
+        if (plan.entries.isEmpty()) {
+            throw IllegalStateException(
+                "Nothing could be archived from ${items.size} selected item(s)" +
+                    if (plan.skipped > 0) ": ${plan.skipped} could not be read" else "",
+            )
+        }
+
         var fileCount = 0
         var dirCount = 0
         var totalBytes = 0L
@@ -158,17 +170,22 @@ object ZipWriter {
 
         for (source in sources) {
             if (isCancelled()) throw CancellationException("Compression cancelled")
+            // A selected root that is itself a symlink must still be archived:
+            // the user picked it deliberately. Walk the link's target but keep
+            // the link's own name as the entry prefix. Descendant links are
+            // still skipped, so a link cycle cannot hang the walk.
+            val root = runCatching { source.root.toRealPath() }.getOrDefault(source.root)
             try {
-                Files.walkFileTree(source.root, object : SimpleFileVisitor<Path>() {
+                Files.walkFileTree(root, object : SimpleFileVisitor<Path>() {
 
                     override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
                         if (isCancelled()) throw CancellationException("Compression cancelled")
                         if (isSamePath(dir, target)) return FileVisitResult.SKIP_SUBTREE
-                        val isRoot = isSamePath(dir, source.root)
+                        val isRoot = isSamePath(dir, root)
                         if (!isRoot && (attrs.isSymbolicLink || Files.isSymbolicLink(dir))) {
                             return FileVisitResult.SKIP_SUBTREE
                         }
-                        val name = entryNameOf(source.prefix, source.root, dir, isDirectory = true)
+                        val name = entryNameOf(source.prefix, root, dir, isDirectory = true)
                         if (!isRoot && exclusions.isExcluded(name)) return FileVisitResult.SKIP_SUBTREE
                         entries += Planned(dir, name, isDirectory = true, mtime = attrs.lastModifiedTime().toMillis())
                         return FileVisitResult.CONTINUE
@@ -181,8 +198,12 @@ object ZipWriter {
                             skipped++
                             return FileVisitResult.CONTINUE
                         }
-                        val name = entryNameOf(source.prefix, source.root, file, isDirectory = false)
-                        if (exclusions.isExcluded(name)) return FileVisitResult.CONTINUE
+                        val isRoot = isSamePath(file, root)
+                        val name = entryNameOf(source.prefix, root, file, isDirectory = false)
+                        // Roots are exempt: right-clicking `report.zip` asks for
+                        // `report.zip`, and a default `*.zip` pattern must not
+                        // turn that into a silently empty archive.
+                        if (!isRoot && exclusions.isExcluded(name)) return FileVisitResult.CONTINUE
                         entries += Planned(file, name, isDirectory = false, mtime = attrs.lastModifiedTime().toMillis())
                         fileTotal++
                         return FileVisitResult.CONTINUE
