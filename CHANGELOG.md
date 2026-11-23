@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `PRIVATE_KEY_PASSWORD` and `PUBLISH_TOKEN` environment variables and are
   never committed.
 
-[0.1.3]: https://github.com/lrong/idea-compress-plugin/releases/tag/v0.1.3
+[0.1.3]: https://github.com/future314/idea-compress-plugin/releases/tag/v0.1.3
 
 ## [0.1.2] - 2026-11-23
 
@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The context-menu label always shows the name the archive will get, for both
   single and multiple selections.
 
-[0.1.2]: https://github.com/lrong/idea-compress-plugin/releases/tag/v0.1.2
+[0.1.2]: https://github.com/future314/idea-compress-plugin/releases/tag/v0.1.2
 
 ## [0.1.1] - 2026-11-23
 
@@ -53,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `resource-bundle` is also declared on `<actions>`, removing a
   "Cannot find plugin resource-bundle" warning from the IDE log.
 
-[0.1.1]: https://github.com/lrong/idea-compress-plugin/releases/tag/v0.1.1
+[0.1.1]: https://github.com/future314/idea-compress-plugin/releases/tag/v0.1.1
 
 ## [0.1.0] - 2026-11-23
 
@@ -72,5 +72,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Completion notification with **Show in Explorer**.
 - English and Simplified Chinese UI.
 
-[Unreleased]: https://github.com/lrong/idea-compress-plugin/compare/v0.1.3...HEAD
-[0.1.0]: https://github.com/lrong/idea-compress-plugin/releases/tag/v0.1.0
+[Unreleased]: https://github.com/future314/idea-compress-plugin/compare/v0.1.3...HEAD
+[0.1.0]: https://github.com/future314/idea-compress-plugin/releases/tag/v0.1.0

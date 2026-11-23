@@ -132,6 +132,7 @@ Windows 资源管理器和 Linux `unzip` 都认这个标志。
 | id | `lrong.file-compressor` |
 | 显示名 | `File Compressor` |
 | 作者 | `lrong` / `1452678450@qq.com` |
+| 项目主页 | <https://github.com/future314/idea-compress-plugin> |
 
 ### 已就绪
 
@@ -143,10 +144,14 @@ Windows 资源管理器和 Linux `unzip` 都认这个标志。
 
 ### 上传前还差
 
-- [ ] **`<vendor url>`** —— 项目主页（一般填源码仓库地址），让用户有地方报 bug
-- [ ] **实际运行验证** —— 尚未在真实 IDEA 里跑过；至少确认中文文件名在 Windows 资源管理器里不乱码
-- [ ] **Marketplace 账号 + 签名证书** —— 在 <https://plugins.jetbrains.com/author/me/signing> 生成
+- [x] **`<vendor url>`** —— 指向 GitHub 仓库，用户有地方看源码、报 bug
+- [ ] **Marketplace 签名证书** —— 在 <https://plugins.jetbrains.com/author/me/signing> 生成，需要证书链 + 私钥
 - [ ] 英文 README 与市场页面截图
+
+### 发布后
+
+- [ ] 从 Marketplace 安装并做一轮手工验证（中文文件名在 Windows 资源管理器里是否乱码是重点）
+- [ ] 吊销本次使用的上传令牌，重新生成一个自行保管
 
 ### 相关地址（均已实测可达）
 

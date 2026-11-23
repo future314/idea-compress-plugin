@@ -8,10 +8,7 @@
     -->
     <id>lrong.file-compressor</id>
     <name>File Compressor</name>
-    <!-- url is intentionally absent for now: add the project homepage (usually
-         the source repository) before the first upload so users have somewhere
-         to report bugs. -->
-    <vendor email="1452678450@qq.com">lrong</vendor>
+    <vendor email="1452678450@qq.com" url="https://github.com/future314/idea-compress-plugin">lrong</vendor>
 
     <description><![CDATA[
         <p>Pack selected files and folders into a ZIP archive without leaving the IDE.</p>
