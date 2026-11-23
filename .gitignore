@@ -17,3 +17,6 @@ Thumbs.db
 
 # Local env
 *.log
+
+# scratch / downloaded docs
+*.html
