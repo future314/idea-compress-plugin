@@ -1,3 +1,4 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -79,7 +80,18 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            recommended()
+            // Deliberately NOT `recommended()`, which picks IDEs near the BUILD
+            // target (251.x). What actually needs proving is that the code still
+            // runs on the OLDEST IDE we claim to support: sinceBuild is 241 but
+            // we compile against 2025.1, so a 242+ API could sneak in and only
+            // fail for users on 2024.1. Verifying against 241 is the guard.
+            //
+            // `create` pins exact releases rather than `select`, which would
+            // drag in every patch release in the range.
+            create(IntelliJPlatformType.IntellijIdeaCommunity, "2024.1.7")
+            create(IntelliJPlatformType.IntellijIdeaCommunity, "2025.1.1")
+            // Free extra check: the exact build installed on this machine.
+            local("D:/install/IntelliJ IDEA 2025.1.1.1")
         }
     }
 }

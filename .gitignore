@@ -8,6 +8,9 @@ out/
 # SDD scratch
 .superpowers/
 
+# IntelliJ Platform Gradle Plugin download cache
+.intellijPlatform/
+
 # OS
 .DS_Store
 Thumbs.db
