@@ -102,7 +102,7 @@ intellijPlatform {
     //   PRIVATE_KEY               PEM private key
     //   PRIVATE_KEY_PASSWORD      key password (may be empty)
     //
-    // Generate these at https://plugins.jetbrains.com/author (signing keys).
+    // Generate these at https://plugins.jetbrains.com/author/me/signing.
     // Without them `buildPlugin` still works; only `signPlugin`/`publishPlugin` fail.
     signing {
         certificateChain = providers.environmentVariable("CERTIFICATE_CHAIN")
@@ -112,7 +112,7 @@ intellijPlatform {
 
     // Upload token also comes from the environment:
     //
-    //   PUBLISH_TOKEN             from https://plugins.jetbrains.com/author (permanent token)
+    //   PUBLISH_TOKEN             from https://plugins.jetbrains.com/author/me/tokens
     //
     // Run `./gradlew publishPlugin` once signing is configured.
     publishing {

@@ -145,8 +145,20 @@ Windows 资源管理器和 Linux `unzip` 都认这个标志。
 
 - [ ] **`<vendor url>`** —— 项目主页（一般填源码仓库地址），让用户有地方报 bug
 - [ ] **实际运行验证** —— 尚未在真实 IDEA 里跑过；至少确认中文文件名在 Windows 资源管理器里不乱码
-- [ ] **Marketplace 账号 + 签名证书** —— 在 <https://plugins.jetbrains.com/author> 生成
+- [ ] **Marketplace 账号 + 签名证书** —— 在 <https://plugins.jetbrains.com/author/me/signing> 生成
 - [ ] 英文 README 与市场页面截图
+
+### 相关地址（均已实测可达）
+
+| 用途 | 地址 |
+|---|---|
+| 作者面板（登录入口） | <https://plugins.jetbrains.com/author/me> |
+| **签名密钥**（证书链 + 私钥） | <https://plugins.jetbrains.com/author/me/signing> |
+| **上传令牌**（`PUBLISH_TOKEN`） | <https://plugins.jetbrains.com/author/me/tokens> |
+| 已发布插件管理 | <https://plugins.jetbrains.com/author/me/plugins> |
+| JetBrains 账号 | <https://account.jetbrains.com/> |
+
+用你的 JetBrains 账号登录即可。注意顶层的 `/author` 是 404，必须带 `/me`。
 
 ### 签名与上传
 
@@ -156,7 +168,7 @@ Windows 资源管理器和 Linux `unzip` 都认这个标志。
 export CERTIFICATE_CHAIN="$(cat cert-chain.pem)"
 export PRIVATE_KEY="$(cat private.pem)"
 export PRIVATE_KEY_PASSWORD="..."
-export PUBLISH_TOKEN="..."          # https://plugins.jetbrains.com/author
+export PUBLISH_TOKEN="..."          # https://plugins.jetbrains.com/author/me/tokens
 
 ./gradlew verifyPlugin signPlugin   # 签名并做最终校验
 ./gradlew publishPlugin             # 上传
