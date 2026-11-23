@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-23
+
+### Changed
+
+- Plugin identity finalised ahead of the first Marketplace upload: id is now
+  `lrong.file-compressor`, vendor is `lrong`. The id is permanent once uploaded
+  and was checked against the Marketplace before being chosen.
+
+### Added
+
+- `signPlugin` and `publishPlugin` configuration. Signing certificate, private
+  key and upload token are read from the `CERTIFICATE_CHAIN`, `PRIVATE_KEY`,
+  `PRIVATE_KEY_PASSWORD` and `PUBLISH_TOKEN` environment variables and are
+  never committed.
+
+[0.1.3]: https://github.com/lrong/idea-compress-plugin/releases/tag/v0.1.3
+
 ## [0.1.2] - 2026-11-23
 
 ### Changed
@@ -55,5 +72,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Completion notification with **Show in Explorer**.
 - English and Simplified Chinese UI.
 
-[Unreleased]: https://github.com/lrong/idea-compress-plugin/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/lrong/idea-compress-plugin/compare/v0.1.3...HEAD
 [0.1.0]: https://github.com/lrong/idea-compress-plugin/releases/tag/v0.1.0

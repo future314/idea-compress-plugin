@@ -94,6 +94,31 @@ intellijPlatform {
             local("D:/install/IntelliJ IDEA 2025.1.1.1")
         }
     }
+
+    // Signing is required by the JetBrains Marketplace. Everything secret comes
+    // from the environment and is never committed:
+    //
+    //   CERTIFICATE_CHAIN         PEM certificate chain from your Marketplace account
+    //   PRIVATE_KEY               PEM private key
+    //   PRIVATE_KEY_PASSWORD      key password (may be empty)
+    //
+    // Generate these at https://plugins.jetbrains.com/author (signing keys).
+    // Without them `buildPlugin` still works; only `signPlugin`/`publishPlugin` fail.
+    signing {
+        certificateChain = providers.environmentVariable("CERTIFICATE_CHAIN")
+        privateKey = providers.environmentVariable("PRIVATE_KEY")
+        password = providers.environmentVariable("PRIVATE_KEY_PASSWORD")
+    }
+
+    // Upload token also comes from the environment:
+    //
+    //   PUBLISH_TOKEN             from https://plugins.jetbrains.com/author (permanent token)
+    //
+    // Run `./gradlew publishPlugin` once signing is configured.
+    publishing {
+        token = providers.environmentVariable("PUBLISH_TOKEN")
+        channels = providers.provider { emptyList<String>() }
+    }
 }
 
 tasks {

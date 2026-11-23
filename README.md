@@ -123,18 +123,46 @@ Windows 资源管理器和 Linux `unzip` 都认这个标志。
 - 压缩读取的是**磁盘上的内容**。执行前会 `saveAllDocuments()` 把未保存的编辑器缓冲写盘，
   保证归档和你看到的一致。
 
-## 发布到 JetBrains 插件市场（未做）
+## 发布到 JetBrains 插件市场
 
-⚠️ **`<id>` 一旦上传就永久无法更改。** 当前用的是占位值 `com.lrong.idea-compress`，
-首次上传前必须最终敲定 id / name / vendor。
+**身份已定稿**（`<id>` 上传后永久不可更改，已确认未被占用）：
 
-- [ ] 最终敲定 `<id>`、`<name>`
-- [ ] `<vendor>` 填真实姓名 / 邮箱 / URL
-- [ ] `<description>` 英文 HTML ≥ 40 字符，符合 JetBrains 文案规范
-- [ ] `./gradlew verifyPlugin` 对 IC 2024.1.7 / 2025.1.1 全绿
-- [ ] 用中文文件名实际压缩并双击打开确认不乱码
-- [ ] 申请 Marketplace 上传令牌 → 配置 `signPlugin` 的证书链和私钥 → `publishPlugin`
-- [ ] README 补英文版、截图
+| 项 | 值 |
+|---|---|
+| id | `lrong.file-compressor` |
+| 显示名 | `File Compressor` |
+| 作者 | `lrong` / `1452678450@qq.com` |
+
+### 已就绪
+
+- [x] `<id>` / `<name>` / `<vendor>` 定稿，id 已查重未被占用
+- [x] `<description>` 英文 HTML ≥ 40 字符，符合 JetBrains 文案规范
+- [x] `./gradlew verifyPlugin` 对 IC-241.19416.15 / IU-251.25410.129 / IC-251.25410.109 全 **Compatible**
+- [x] `signPlugin` / `publishPlugin` 配置就绪（密钥走环境变量，不进仓库）
+- [x] README / CHANGELOG / 插件图标 / 英中双语 UI
+
+### 上传前还差
+
+- [ ] **`<vendor url>`** —— 项目主页（一般填源码仓库地址），让用户有地方报 bug
+- [ ] **实际运行验证** —— 尚未在真实 IDEA 里跑过；至少确认中文文件名在 Windows 资源管理器里不乱码
+- [ ] **Marketplace 账号 + 签名证书** —— 在 <https://plugins.jetbrains.com/author> 生成
+- [ ] 英文 README 与市场页面截图
+
+### 签名与上传
+
+密钥全部走环境变量，**不要写进 `gradle.properties` 或提交进仓库**：
+
+```bash
+export CERTIFICATE_CHAIN="$(cat cert-chain.pem)"
+export PRIVATE_KEY="$(cat private.pem)"
+export PRIVATE_KEY_PASSWORD="..."
+export PUBLISH_TOKEN="..."          # https://plugins.jetbrains.com/author
+
+./gradlew verifyPlugin signPlugin   # 签名并做最终校验
+./gradlew publishPlugin             # 上传
+```
+
+没有这些变量时 `buildPlugin` 照常工作，只有 `signPlugin` / `publishPlugin` 会失败 —— 这是有意的。
 
 ## 目录结构
 

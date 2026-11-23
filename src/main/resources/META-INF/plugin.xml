@@ -1,14 +1,17 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <!--
-      PLACEHOLDER IDENTITY.
-      The <id> below is PERMANENT once this plugin is uploaded to the JetBrains
-      Marketplace and can never be changed afterwards. Finalise id / name /
-      vendor BEFORE the first upload. See plan section 13.
+      IDENTITY IS FINAL.
+      The <id> is PERMANENT once this plugin is uploaded to the JetBrains
+      Marketplace and can never be changed afterwards. Confirmed before the
+      first upload; checked against the Marketplace and not in use.
     -->
-    <id>com.lrong.idea-compress</id>
+    <id>lrong.file-compressor</id>
     <name>File Compressor</name>
-    <vendor email="placeholder@example.com" url="https://example.com">Your Name</vendor>
+    <!-- url is intentionally absent for now: add the project homepage (usually
+         the source repository) before the first upload so users have somewhere
+         to report bugs. -->
+    <vendor email="1452678450@qq.com">lrong</vendor>
 
     <description><![CDATA[
         <p>Pack selected files and folders into a ZIP archive without leaving the IDE.</p>
