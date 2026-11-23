@@ -95,18 +95,22 @@ intellijPlatform {
         }
     }
 
-    // Signing is required by the JetBrains Marketplace. Everything secret comes
-    // from the environment and is never committed:
+    // Signing is required if you want installers to see no "unverified" warning.
+    // The JetBrains Marketplace has no key-registration page (the docs say that
+    // is "not available yet"), so the author generates the key pair themselves
+    // with openssl -- see README "签名与上传" for the exact commands.
     //
-    //   CERTIFICATE_CHAIN         PEM certificate chain from your Marketplace account
-    //   PRIVATE_KEY               PEM private key
-    //   PRIVATE_KEY_PASSWORD      key password (may be empty)
+    // File-based, so no multi-kilobyte PEM blobs end up in the environment:
     //
-    // Generate these at https://plugins.jetbrains.com/author/me/signing.
-    // Without them `buildPlugin` still works; only `signPlugin`/`publishPlugin` fail.
+    //   CERTIFICATE_CHAIN_FILE   path to chain.crt
+    //   PRIVATE_KEY_FILE         path to private.pem
+    //   PRIVATE_KEY_PASSWORD     key passphrase (may be empty)
+    //
+    // `signPlugin` is skipped when these are absent, so `buildPlugin` still
+    // works on a machine with no keys at all.
     signing {
-        certificateChain = providers.environmentVariable("CERTIFICATE_CHAIN")
-        privateKey = providers.environmentVariable("PRIVATE_KEY")
+        certificateChainFile = providers.environmentVariable("CERTIFICATE_CHAIN_FILE").map { file(it) }
+        privateKeyFile = providers.environmentVariable("PRIVATE_KEY_FILE").map { file(it) }
         password = providers.environmentVariable("PRIVATE_KEY_PASSWORD")
     }
 
