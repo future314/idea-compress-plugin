@@ -33,7 +33,16 @@
     <resource-bundle>messages.CompressBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <notificationGroup id="File Compressor" displayType="BALLOON"/>
+        <!-- id must match CompressNotifier.GROUP_ID -->
+        <notificationGroup id="com.lrong.compress" displayType="BALLOON" isLogByDefault="true"/>
+        <!-- bundle+key is the localised form bundled plugins use (see
+             database-plugin.jar's applicationConfigurable entries) -->
+        <applicationConfigurable
+                id="com.lrong.compress.settings"
+                parentId="tools"
+                instance="com.lrong.compress.settings.CompressConfigurable"
+                bundle="messages.CompressBundle"
+                key="settings.displayName"/>
     </extensions>
 
     <actions>
