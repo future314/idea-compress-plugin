@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <!--
+    Plugin logo. JetBrains convention: 40x40, at least 2px transparent
+    padding, no gradients, legible on both light and dark themes.
+    A closed archive box with a zipper down the middle.
+  -->
+  <g fill="none" stroke="#3B7DD8" stroke-width="2.4" stroke-linejoin="round">
+    <!-- box body -->
+    <rect x="6" y="12" width="28" height="22" rx="3"/>
+    <!-- lid -->
+    <path d="M4 12 L20 4 L36 12"/>
+  </g>
+  <!-- zipper tape -->
+  <path d="M20 12 L20 34" stroke="#3B7DD8" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- zipper teeth -->
+  <g fill="#3B7DD8">
+    <rect x="16.4" y="16" width="7.2" height="2.2" rx="1.1"/>
+    <rect x="16.4" y="21" width="7.2" height="2.2" rx="1.1"/>
+    <rect x="16.4" y="26" width="7.2" height="2.2" rx="1.1"/>
+    <rect x="16.4" y="31" width="7.2" height="2.2" rx="1.1"/>
+  </g>
+</svg>

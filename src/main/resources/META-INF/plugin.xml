@@ -1,0 +1,48 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!--
+      PLACEHOLDER IDENTITY.
+      The <id> below is PERMANENT once this plugin is uploaded to the JetBrains
+      Marketplace and can never be changed afterwards. Finalise id / name /
+      vendor BEFORE the first upload. See plan section 13.
+    -->
+    <id>com.lrong.idea-compress</id>
+    <name>File Compressor</name>
+    <vendor email="placeholder@example.com" url="https://example.com">Your Name</vendor>
+
+    <description><![CDATA[
+        <p>Pack selected files and folders into a ZIP archive without leaving the IDE.</p>
+        <ul>
+            <li>Select one or more files or folders in the Project view, then choose <b>Compress to ZIP</b>.</li>
+            <li>The archive is created next to the selection and named after the first selected item.</li>
+            <li>Version control metadata, build output and dependency folders are skipped by default.</li>
+            <li>Exclusion patterns can be edited in <i>Settings | Tools | File Compressor</i>.</li>
+        </ul>
+    ]]></description>
+
+    <change-notes><![CDATA[
+        <p>0.1.0</p>
+        <ul>
+            <li>Initial release.</li>
+        </ul>
+    ]]></change-notes>
+
+    <!-- Platform only: no Java/PSI dependency, so the plugin loads in IC and IU alike. -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <resource-bundle>messages.CompressBundle</resource-bundle>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="File Compressor" displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <action id="Compress.CompressAction"
+                class="com.lrong.compress.CompressAction"
+                text="Compress to ZIP"
+                description="Compress the selected files and folders into a ZIP archive">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="CutCopyPasteGroup"/>
+            <add-to-group group-id="EditorTabPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
