@@ -1,0 +1,16 @@
+# Build
+.gradle/
+build/
+out/
+.idea/
+*.iml
+
+# SDD scratch
+.superpowers/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local env
+*.log

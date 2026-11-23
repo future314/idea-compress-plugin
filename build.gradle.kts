@@ -1,0 +1,95 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    id("java")
+    id("org.jetbrains.kotlin.jvm") version "2.4.21"
+    id("org.jetbrains.intellij.platform") version "2.20.1"
+}
+
+group = providers.gradleProperty("pluginGroup").get()
+version = providers.gradleProperty("pluginVersion").get()
+
+kotlin {
+    // Toolchain 21 compiles the code...
+    jvmToolchain(21)
+}
+
+// ...but the bytecode must be Java 17: sinceBuild 241 is IDEA 2024.1, which
+// runs on JBR 17 (2024.2 is the first JBR 21 release). A class file version
+// 61+ fails there with UnsupportedClassVersionError.
+//
+// This is set on the TASKS, not on the `kotlin { compilerOptions { } }`
+// extension: `jvmToolchain(21)` derives the task's jvmTarget from the toolchain
+// and the KGP JVM-target consistency check reads the task value, so an
+// extension-level setting is silently ignored and the build fails with
+// "Inconsistent JVM-target compatibility ... compileJava (17) and
+// compileKotlin (21)". -Xjdk-release also blocks accidental use of Java 18+ APIs.
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+        freeCompilerArgs.add("-Xjdk-release=17")
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
+}
+
+dependencies {
+    intellijPlatform {
+        // IC on purpose: see gradle.properties. Compiling against Community
+        // keeps us off Ultimate-only APIs so the plugin also loads in IC.
+        create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
+        pluginVerifier()
+        // NOTE: deliberately NO testFramework(TestFrameworkType.Platform).
+        // Tests in src/test are pure JVM (no IDE fixture) and run on JUnit 5.
+        // Adding the platform test framework registers a JUnit 5
+        // LauncherSessionListener (com.intellij.tests.JUnit5TestSessionListener)
+        // that fails to load without the full IDE runtime classpath and kills
+        // the whole test task at startup.
+    }
+
+    // JUnit 5 runs our tests.
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // JUnit 4 is still needed on the runtime classpath: the IntelliJ Platform
+    // jars carry service registrations whose classes reference
+    // org.junit.runners.model.Statement, and without this the test executor
+    // dies at startup with ClassNotFoundException before any test runs.
+    testImplementation("junit:junit:4.13.2")
+}
+
+intellijPlatform {
+    pluginConfiguration {
+        name = providers.gradleProperty("pluginName")
+        version = providers.gradleProperty("pluginVersion")
+        ideaVersion {
+            sinceBuild = providers.gradleProperty("pluginSinceBuild")
+            untilBuild = provider { null }
+        }
+    }
+
+    pluginVerification {
+        ides {
+            recommended()
+        }
+    }
+}
+
+tasks {
+    withType<Test> {
+        useJUnitPlatform()
+    }
+
+    wrapper {
+        gradleVersion = "9.9.2"
+    }
+}
