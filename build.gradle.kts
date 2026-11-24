@@ -121,7 +121,10 @@ intellijPlatform {
     // Run `./gradlew publishPlugin` once signing is configured.
     publishing {
         token = providers.environmentVariable("PUBLISH_TOKEN")
-        channels = providers.provider { emptyList<String>() }
+        // Explicit: an omitted `hidden` would be passed through to the upload
+        // API's `isHidden` flag, and a hidden plugin uploads successfully while
+        // staying off the public listing entirely.
+        hidden = false
     }
 }
 

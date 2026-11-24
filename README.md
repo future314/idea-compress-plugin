@@ -134,6 +134,22 @@ Windows 资源管理器和 Linux `unzip` 都认这个标志。
 | 作者 | `lrong` / `1452678450@qq.com` |
 | 项目主页 | <https://github.com/future314/idea-compress-plugin> |
 
+### ⚠️ 首次发布必须在网页上手动上传
+
+**`publishPlugin` 无法创建新插件，只能给已存在的插件加版本。** 官方文档：
+*"The first plugin publication must always be uploaded manually."*
+
+三条独立证据都指向这一点：
+
+| 来源 | 提示 |
+|---|---|
+| 官方 publishing 文档 | 首次发布必须手动上传 |
+| `./gradlew publishPlugin` | `Cannot find plugin ... you need to upload the plugin to the repository at least once manually` |
+| REST `POST /api/updates/upload` | `404 "Can't find Plugin with id ..."` |
+
+流程：登录 Marketplace → Profile 页 → **Add new plugin** → 上传 `*-signed.zip` → 填许可证与仓库地址 → 提交。
+**审核通过后**，`./gradlew publishPlugin` 才可用于后续版本，不再需要走网页。
+
 ### 已就绪
 
 - [x] `<id>` / `<name>` / `<vendor>` 定稿，id 已查重未被占用
@@ -145,7 +161,8 @@ Windows 资源管理器和 Linux `unzip` 都认这个标志。
 ### 上传前还差
 
 - [x] **`<vendor url>`** —— 指向 GitHub 仓库，用户有地方看源码、报 bug
-- [ ] **Marketplace 签名证书** —— 在 <https://plugins.jetbrains.com/author/me/signing> 生成，需要证书链 + 私钥
+- [x] **签名证书** —— 用 openssl 自行生成（Marketplace 没有密钥登记页），存于仓库外
+- [x] **许可证** —— MIT
 - [ ] 英文 README 与市场页面截图
 
 ### 发布后
@@ -202,4 +219,4 @@ src/test/kotlin/          54 个纯逻辑单元测试
 
 ## License
 
-待定。
+[MIT](LICENSE) © 2026 lrong
